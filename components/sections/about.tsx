@@ -32,7 +32,10 @@ export function About({ t }: { t: Dictionary }) {
           {photo && (
             <div data-reveal="left" className="relative mx-auto w-full max-w-[24rem] lg:max-w-none">
               <div aria-hidden="true" className="shape-blob absolute -inset-3 -z-10 -rotate-3 bg-peach-soft" />
-              <div className="shape-petal relative aspect-[4/3.4] overflow-hidden shadow-lift">
+              <div
+                className="shape-petal relative overflow-hidden shadow-lift"
+                style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
+              >
                 <Image
                   src={photo.src}
                   alt={t.a11y.aboutPhotoAlt}

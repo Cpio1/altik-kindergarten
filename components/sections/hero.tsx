@@ -78,7 +78,10 @@ export function Hero({ t }: { t: Dictionary }) {
           <div aria-hidden="true" className="animate-morph absolute -inset-3 -z-10 rotate-6 bg-sun/70 sm:-inset-4" />
           <div aria-hidden="true" className="animate-morph absolute -inset-1 -z-10 -rotate-6 bg-mint/60 [animation-delay:-5s]" />
 
-          <div className="animate-morph relative aspect-square overflow-hidden bg-white shadow-lift ring-[6px] ring-white">
+          <div
+            className="animate-morph relative aspect-square overflow-hidden bg-white shadow-lift ring-[6px] ring-white"
+            style={photo ? { aspectRatio: `${photo.width} / ${photo.height}` } : undefined}
+          >
             {photo ? (
               <Image
                 src={photo.src}

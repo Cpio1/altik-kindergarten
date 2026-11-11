@@ -1,6 +1,89 @@
 {
   "logo": null,
-  "hero": null,
-  "about": null,
-  "gallery": []
+  "hero": {
+    "src": "/images/main-page.jpeg",
+    "width": 1280,
+    "height": 960,
+    "transparent": false
+  },
+  "about": {
+    "src": "/images/image5.jpeg",
+    "width": 1280,
+    "height": 720,
+    "transparent": false
+  },
+  "gallery": [
+    {
+      "src": "/images/image1.jpeg",
+      "width": 1280,
+      "height": 720,
+      "transparent": false
+    },
+    {
+      "src": "/images/image2.jpeg",
+      "width": 1280,
+      "height": 721,
+      "transparent": false
+    },
+    {
+      "src": "/images/image3.jpeg",
+      "width": 1280,
+      "height": 720,
+      "transparent": false
+    },
+    {
+      "src": "/images/image4.jpeg",
+      "width": 720,
+      "height": 1280,
+      "transparent": false
+    },
+    {
+      "src": "/images/image6.jpeg",
+      "width": 899,
+      "height": 1599,
+      "transparent": false
+    },
+    {
+      "src": "/images/image7.jpeg",
+      "width": 1600,
+      "height": 1200,
+      "transparent": false
+    },
+    {
+      "src": "/images/image8.jpeg",
+      "width": 1600,
+      "height": 1200,
+      "transparent": false
+    },
+    {
+      "src": "/images/image9.jpeg",
+      "width": 1200,
+      "height": 1600,
+      "transparent": false
+    },
+    {
+      "src": "/images/image10.jpeg",
+      "width": 1200,
+      "height": 1600,
+      "transparent": false
+    },
+    {
+      "src": "/images/image11.jpeg",
+      "width": 960,
+      "height": 1280,
+      "transparent": false
+    },
+    {
+      "src": "/images/image12.jpeg",
+      "width": 960,
+      "height": 1280,
+      "transparent": false
+    },
+    {
+      "src": "/images/image13.jpeg",
+      "width": 1280,
+      "height": 720,
+      "transparent": false
+    }
+  ]
 }

@@ -4,9 +4,10 @@
  *
  * Соглашение об именах файлов:
  *   logo.*        — логотип (лучше PNG/WebP/SVG с прозрачным фоном)
- *   main-page.*   — фото главного экрана
- *   main-page2.*  — фото раздела «Біз туралы»
- *   любые другие  — попадают в галерею (сортировка по имени: 01.jpg, 02.jpg, …)
+ *   main-page.*   — фото главного экрана (если положить main-page.png, он возьмётся вместо JPEG)
+ *   ABOUT_PHOTO   — фото раздела «Біз туралы» (имя без расширения задаётся ниже)
+ *   EXCLUDED      — файлы, которые не показываются на сайте нигде (например, main-page2)
+ *   любые другие  — попадают в галерею (сортировка по имени: image1, image2, …, image10)
  *
  * Если у файла несколько форматов с одним именем, берётся PNG → WebP → AVIF → JPG → SVG.
  */
@@ -18,7 +19,11 @@ import sharp from "sharp";
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const dir = path.join(root, "public", "images");
 const EXT_RANK = [".png", ".webp", ".avif", ".jpg", ".jpeg", ".svg"];
-const SPECIAL = { logo: "logo", hero: "main-page", about: "main-page2" };
+const SPECIAL = { logo: "logo", hero: "main-page" };
+/** Фото для «Біз туралы» — одно из обычных фото; в галерее оно не дублируется. */
+const ABOUT_PHOTO = "image5";
+/** Эти файлы могут лежать в папке, но на сайт не попадают никогда. */
+const EXCLUDED = new Set(["main-page2"]);
 
 let files = [];
 try {
@@ -50,6 +55,7 @@ const byBase = new Map();
 for (const file of files) {
   const ext = path.extname(file).toLowerCase();
   const base = path.basename(file, path.extname(file)).toLowerCase();
+  if (EXCLUDED.has(base)) continue;
   const prev = byBase.get(base);
   if (!prev || EXT_RANK.indexOf(ext) < EXT_RANK.indexOf(path.extname(prev).toLowerCase())) byBase.set(base, file);
 }
@@ -59,8 +65,10 @@ for (const [key, base] of Object.entries(SPECIAL)) {
   const file = byBase.get(base);
   if (file) result[key] = await describe(file);
 }
+if (byBase.has(ABOUT_PHOTO)) result.about = await describe(byBase.get(ABOUT_PHOTO));
 
-const specialBases = new Set(Object.values(SPECIAL));
+
+const specialBases = new Set([...Object.values(SPECIAL), ABOUT_PHOTO]);
 const galleryFiles = [...byBase.entries()]
   .filter(([base]) => !specialBases.has(base) && !base.startsWith("og"))
   .map(([, file]) => file)
@@ -70,13 +78,9 @@ for (const file of galleryFiles) {
   const info = await describe(file);
   if (info) result.gallery.push(info);
 }
-// Фото главного экрана и «Біз туралы» тоже показываем в галерее — это реальные снимки садика.
-for (const key of ["hero", "about"]) {
-  if (result[key]) result.gallery.push(result[key]);
-}
 
 await writeFile(path.join(root, "lib", "images.generated.json"), JSON.stringify(result, null, 2) + "\n");
 console.log(
   `[images] logo: ${result.logo ? "есть" : "нет"}, main-page: ${result.hero ? "есть" : "нет"}, ` +
-    `main-page2: ${result.about ? "есть" : "нет"}, галерея: ${result.gallery.length}`,
+    `«Біз туралы»: ${result.about ? ABOUT_PHOTO : "нет"}, галерея: ${result.gallery.length}`,
 );
