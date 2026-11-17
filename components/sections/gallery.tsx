@@ -14,7 +14,7 @@ export function Gallery({ t }: { t: Dictionary }) {
   const g = t.gallery;
 
   return (
-    <section id="gallery" className="section overflow-hidden">
+    <section id="gallery" className="section overflow-hidden lg:!pt-9 lg:!pb-14">
       <Star className="animate-wiggle absolute top-12 right-[6%] hidden w-9 md:block" color="var(--color-sky)" />
       <div className="container-x">
         <div className="text-center">
@@ -22,15 +22,15 @@ export function Gallery({ t }: { t: Dictionary }) {
             <Icon name="camera" className="size-4" />
             {g.eyebrow}
           </p>
-          <h2 data-reveal className="section-title mt-3">
+          <h2 data-reveal className="section-title mt-3 lg:mt-2 lg:!text-[2.2rem]">
             {g.title}
           </h2>
-          <p data-reveal className="mx-auto mt-3 max-w-xl text-ink-soft">
+          <p data-reveal className="mx-auto mt-3 max-w-xl text-ink-soft lg:mt-2">
             {g.intro}
           </p>
         </div>
 
-        <div data-reveal className="mt-10">
+        <div data-reveal className="mt-10 lg:mt-7">
           {photos.length > 0 ? (
             <GalleryGrid
               photos={photos}

@@ -27,6 +27,7 @@ const BREAKPOINTS = [
   { cols: 4, cls: { "1x1": "lg:col-span-1 lg:row-span-1", "2x2": "lg:col-span-2 lg:row-span-2", "1x2": "lg:col-span-1 lg:row-span-2" } },
 ] as const;
 
+const DESKTOP_COLS = 4;
 const isPortrait = (p: SiteImage) => p.height > p.width * 1.05;
 
 /** Пустоты при авто-размещении CSS Grid: внутренние (дыры) и в хвосте последнего ряда. */
@@ -53,14 +54,14 @@ function countHoles(tiles: Tile[], cols: number) {
   const last = grid[grid.length - 1] ?? [];
   const trailing = last.length - 1 - last.lastIndexOf(true);
   const total = grid.reduce((n, row) => n + row.filter((x) => !x).length, 0);
-  return { inner: total - trailing, trailing };
+  return { inner: total - trailing, trailing, rows: grid.length };
 }
 
 /** Подбирает, какие горизонтальные фото сделать 2×2: без дыр, с минимумом крупных плиток, ближе к началу. */
 function layout(photos: SiteImage[], cols: number) {
   const base: Tile[] = photos.map((p) => (isPortrait(p) ? "1x2" : "1x1"));
   const wide = base.flatMap((t, i) => (t === "1x1" ? [i] : [])).slice(0, 10);
-  let best = { tiles: base, score: Infinity };
+  let best = { tiles: base, score: Infinity, rows: 0 };
   for (let mask = 0; mask < 1 << wide.length; mask++) {
     const tiles = [...base];
     let score = 0;
@@ -72,7 +73,7 @@ function layout(photos: SiteImage[], cols: number) {
     });
     const holes = countHoles(tiles, cols);
     score += holes.inner * 1000 + holes.trailing * 100;
-    if (score < best.score) best = { tiles, score };
+    if (score < best.score) best = { tiles, score, rows: holes.rows };
   }
   return best;
 }
@@ -90,11 +91,13 @@ function arrange(photos: SiteImage[]) {
   for (const [ka, kb] of [[1, 1], [2, 2], [2, 1], [1, 2], [2, 3], [3, 2]]) {
     candidates.push(interleave(land, port, ka, kb), interleave(port, land, kb, ka));
   }
+  // На десктопе первые фото должны занимать как можно меньше рядов — чтобы раздел помещался в экран ноутбука.
   const cost = (order: SiteImage[]) =>
     BREAKPOINTS.reduce(
       (sum, bp) => sum + layout(order.slice(0, INITIAL), bp.cols).score + layout(order, bp.cols).score,
       0,
-    );
+    ) +
+    layout(order.slice(0, INITIAL), DESKTOP_COLS).rows * 500;
   return candidates.map((order) => ({ order, c: cost(order) })).reduce((a, b) => (b.c < a.c ? b : a)).order;
 }
 
@@ -145,7 +148,7 @@ export function GalleryGrid({ photos: source, labels }: { photos: SiteImage[]; l
 
   return (
     <>
-      <ul className="grid grid-flow-dense auto-rows-[7rem] grid-cols-2 gap-3 sm:auto-rows-[8.5rem] sm:grid-cols-3 sm:gap-4 lg:auto-rows-[11.5rem] lg:grid-cols-4">
+      <ul className="grid grid-flow-dense auto-rows-[7rem] grid-cols-2 gap-3 sm:auto-rows-[8.5rem] sm:grid-cols-3 sm:gap-4 lg:mx-auto lg:max-w-[64rem] lg:auto-rows-[8.75rem] lg:grid-cols-4 lg:gap-3">
         {visible.map((photo, i) => (
           <li
             key={photo.src}
@@ -165,7 +168,7 @@ export function GalleryGrid({ photos: source, labels }: { photos: SiteImage[]; l
                 src={photo.src}
                 alt={fill(labels.photoAlt, i + 1)}
                 fill
-                sizes="(min-width: 1024px) 50vw, (min-width: 640px) 33vw, 50vw"
+                sizes="(min-width: 1024px) 520px, (min-width: 640px) 33vw, 50vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <span className="absolute inset-0 grid place-items-center bg-ink/0 transition-colors duration-300 group-hover:bg-ink/25">
@@ -179,7 +182,7 @@ export function GalleryGrid({ photos: source, labels }: { photos: SiteImage[]; l
       </ul>
 
       {photos.length > INITIAL && (
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center lg:mt-6">
           <button type="button" onClick={() => setExpanded((v) => !v)} className="btn btn-sky" aria-expanded={expanded}>
             {expanded ? labels.showLess : labels.showMore}
           </button>

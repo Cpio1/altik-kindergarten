@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 import { Flower, Wave } from "../decor";
 import { Icon } from "../icons";
 
-/** Кнопка Google Drive появляется только когда в lib/site.ts указана ссылка documentsUrl. */
+/** Кнопка просмотра документов (облако Mail.ru) появляется только когда в lib/site.ts указана ссылка documentsUrl. */
 export function Documents({ t }: { t: Dictionary }) {
   const d = t.documents;
   const hasLink = Boolean(site.documentsUrl);
